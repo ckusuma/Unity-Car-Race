@@ -9,10 +9,12 @@ public class CarMotor : MonoBehaviour {
     public Vector3 currVelocity;
     public float maxVelocity;
     float inputH;
+    float inputH2;
     public float balloons;
     public float lives;
     private Rigidbody rb;
-    private float inputAccel;
+    float inputAccel;
+    float inputAccel2;
 
     // Use this for initialization
     void Start()
@@ -23,12 +25,20 @@ public class CarMotor : MonoBehaviour {
     private void Update()
     {
         inputH = Input.GetAxis("Horizontal");
-        //inputAccel = Input.GetAxis("6th AXIS");
+        inputH2 = Input.GetAxis("Horizontal 2");
+        inputAccel = Input.GetAxis("Right Trigger");
+        
         currVelocity = rb.velocity;
-        if (inputH == -1 || inputH == 1)
+        if (((inputH == -1 || inputH == 1)  && tag == "Car 1"))
         {
             Turn();
         }
+        if (((inputH2 == -1 || inputH2 == 1) && tag == "Car 2"))
+        {
+            Turn2();
+        }
+
+        
     }
 
     // Update is called once per frame
@@ -42,23 +52,50 @@ public class CarMotor : MonoBehaviour {
 
     private void Turn()
     {
+        
         transform.Rotate(new Vector3(0, turnSensitivity * Time.deltaTime * inputH, 0));
+    }
+
+    private void Turn2()
+    {
+
+        transform.Rotate(new Vector3(0, turnSensitivity * Time.deltaTime * inputH2, 0));
     }
 
     private void VelocityControl()
     {
-        if (Input.GetKey(KeyCode.W))
+        if (tag == "Car 1")
         {
-            rb.velocity = currVelocity + (transform.forward * accelIncreaseRate * Time.deltaTime);
-            currVelocity = rb.velocity;
+            if (inputAccel == 1)
+            {
+                rb.velocity = currVelocity + (transform.forward * accelIncreaseRate * Time.deltaTime);
+                currVelocity = rb.velocity;
+            }
+
+
+            float currVelMagnitude = rb.velocity.magnitude;
+
+            if (currVelMagnitude > maxVelocity)
+            {
+                rb.velocity = currVelocity.normalized * maxVelocity;
+            }
         }
-        
 
-        float currVelMagnitude = rb.velocity.magnitude;
-
-        if (currVelMagnitude > maxVelocity)
+        if (tag == "Car 2")
         {
-            rb.velocity = currVelocity.normalized * maxVelocity;
+            if (Input.GetKey(KeyCode.W))
+            {
+                rb.velocity = currVelocity + (transform.forward * accelIncreaseRate * Time.deltaTime);
+                currVelocity = rb.velocity;
+            }
+
+
+            float currVelMagnitude = rb.velocity.magnitude;
+
+            if (currVelMagnitude > maxVelocity)
+            {
+                rb.velocity = currVelocity.normalized * maxVelocity;
+            }
         }
 
 
